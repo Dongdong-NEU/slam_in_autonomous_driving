@@ -21,6 +21,7 @@ int main(int argc, char** argv) {
     FLAGS_stderrthreshold = google::INFO;
     FLAGS_colorlogtostderr = true;
     google::ParseCommandLineFlags(&argc, &argv, true);
+    google::SetLogDestination(google::INFO, "./../log/log.txt");
 
     /// 可视化
     sad::ui::PangolinWindow ui;
