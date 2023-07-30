@@ -30,7 +30,7 @@ void TxtIO::Go() {
         ss << line;
         std::string data_type;
         ss >> data_type;
-
+        
         if (data_type == "IMU" && imu_proc_) {
             double time, gx, gy, gz, ax, ay, az;
             ss >> time >> gx >> gy >> gz >> ax >> ay >> az;

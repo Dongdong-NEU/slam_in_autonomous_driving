@@ -39,14 +39,19 @@ int main(int argc, char** argv) {
         ui->Init();
     }
 
-    /// 记录结果
+    /// 记录结果，将结果都存到fout中；
+    // save_result 是一个函数对象，接收匿名函数，相当于给匿名函数取别名；
     auto save_result = [](std::ofstream& fout, double timestamp, const Sophus::SO3d& R, const Vec3d& v,
                           const Vec3d& p) {
-        auto save_vec3 = [](std::ofstream& fout, const Vec3d& v) { fout << v[0] << " " << v[1] << " " << v[2] << " "; };
+        // save_vec3是一个函数对象，接收匿名函数，相当于给匿名函数取别名；
+        auto save_vec3 = [](std::ofstream& fout, const Vec3d& v) { 
+            fout << v[0] << " " << v[1] << " " << v[2] << " "; };
+        // save_quat是一个函数对象，接受匿名函数，相当于给匿名函数取别名；
         auto save_quat = [](std::ofstream& fout, const Quatd& q) {
             fout << q.w() << " " << q.x() << " " << q.y() << " " << q.z() << " ";
         };
 
+        // 先将时间戳写上；
         fout << std::setprecision(18) << timestamp << " " << std::setprecision(9);
         save_vec3(fout, p);
         save_quat(fout, R.unit_quaternion());
@@ -55,14 +60,19 @@ int main(int argc, char** argv) {
     };
 
     std::ofstream fout("./data/ch3/state.txt");
+    // 将匿名函数作为参数传入，该匿名函数被函数对象接受；
+    // 匿名函数的捕获列表说明那些变量将要在匿名函数中将被用到；
+    // SetIMUProcessFunc将返回对象本身，通常情况下，这种方式用于实现方法链式调用；
     io.SetIMUProcessFunc([&imu_integ, &save_result, &fout, &ui](const sad::IMU& imu) {
+          // 实现imu的积分；
           imu_integ.AddIMU(imu);
+          // 保存imu积分后的结果；
           save_result(fout, imu.timestamp_, imu_integ.GetR(), imu_integ.GetV(), imu_integ.GetP());
           if (ui) {
               ui->UpdateNavState(imu_integ.GetNavState());
               usleep(1e2);
           }
-      }).Go();
+      }).Go(); // 这个.Go()函数用于读取接下来的IMU数据；
 
     // 打开了可视化的话，等待界面退出
     while (ui && !ui->ShouldQuit()) {

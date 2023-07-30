@@ -6,7 +6,7 @@
 #define MAPPING_IMU_H
 
 #include <memory>
-#include "common/eigen_types.h"
+#include "./eigen_types.h"
 
 namespace sad {
 

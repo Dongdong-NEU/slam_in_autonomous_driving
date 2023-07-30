@@ -36,10 +36,15 @@ class TxtIO {
     TxtIO(const std::string &file_path) : fin(file_path) {}
 
     /// 定义回调函数
+    // 定义 IMUProcessFuncType 代替 std::function<void(const IMU &)>这一串；
+    // std::function<void(const IMU &)> 是函数模板，一般用法为：
+    // function<void (int ,string)> f = print; print是已声明好的函数；
     using IMUProcessFuncType = std::function<void(const IMU &)>;
     using OdomProcessFuncType = std::function<void(const Odom &)>;
     using GNSSProcessFuncType = std::function<void(const GNSS &)>;
 
+    // this指针永远指向当前对象，该函数返回对象本身，也就是TxtIO；
+    // 可参见：https://www.yuque.com/dongdong-np4rg/iazlkz/sl3uzvw3lk8aawa0
     TxtIO &SetIMUProcessFunc(IMUProcessFuncType imu_proc) {
         imu_proc_ = std::move(imu_proc);
         return *this;
@@ -60,6 +65,9 @@ class TxtIO {
 
    private:
     std::ifstream fin;
+    // 函数对象；
+    // 相当于：std::function<void(const IMU &)> imu_proc_;
+    // 接受一个const类型的IMU类型的引用，但是还没有初始化；
     IMUProcessFuncType imu_proc_;
     OdomProcessFuncType odom_proc_;
     GNSSProcessFuncType gnss_proc_;
